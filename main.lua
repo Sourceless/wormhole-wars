@@ -32,8 +32,8 @@ end
 function wall_generate(num_points, xvar, yvar, yoff)
     local wall = {}
 
-    for i = -1, num_points + 1 do
-        wall[i] = generate_point(i, num_points, xvar, yvar, yoff)
+    for i = -1, num_points + 1 do -- add an (invisible) point on either side for scrolling
+        wall[i+2] = generate_point(i, num_points, xvar, yvar, yoff)
     end
 
     return wall
