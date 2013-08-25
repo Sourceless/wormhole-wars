@@ -49,23 +49,32 @@ function wall_update(wall)
 end
 
 function wall_draw(wall)
-    for i,p in pairs(wall) do
-        love.graphics.point(p.x + p.dx, p.y + p.dy)
+    local polyline = {}
+
+
+    for i, p in ipairs(wall) do
+        love.graphics.point(p.x + p.dx,
+                            p.y + p.dy)
+
+        table.insert(polyline, p.x + p.dx)
+        table.insert(polyline, p.y + p.dy)
     end
+
+    love.graphics.line(polyline)
 end
 
 
 function love.load()
-    x_variation = 3
-    y_variation = 5
-    local y_dist = 50
-    local num_points = 100
+    x_variation = 40
+    y_variation = 30
+    local y_dist = 100
+    local num_points = 6
 
     wall_top = wall_generate(num_points, x_variation, y_variation, y_dist)
     wall_bottom = wall_generate(num_points, x_variation, y_variation,
                                 love.graphics.getHeight() - y_dist)
 
-    love.graphics.setPoint(2, "rough")
+    love.graphics.setPoint(1, "rough")
 end
 
 
