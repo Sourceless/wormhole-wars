@@ -6,8 +6,8 @@ function generate_point(i, n, xvar, yvar, yoff)
     p.ycycle = math.random()
     p.dx = math.sin(p.xcycle * math.pi) * xvar
     p.dy = math.cos(p.ycycle * math.pi) * yvar
-    p.xcycle_speed = math.random(50, 200)
-    p.ycycle_speed = math.random(50, 200)
+    p.xcycle_speed = math.random(100, 500)
+    p.ycycle_speed = math.random(100, 500)
 
     return p
 end
@@ -32,17 +32,28 @@ end
 function wall_generate(num_points, xvar, yvar, yoff)
     local wall = {}
 
-    for i = -1, num_points + 1 do -- add an (invisible) point on either side for scrolling
+    for i = -1, num_points + 2 do -- add an (invisible) point on either side for scrolling
         wall[i+2] = generate_point(i, num_points, xvar, yvar, yoff)
     end
 
     return wall
 end
 
-function wall_update(wall)
+function wall_update(wall, wall_offset)
     local wall_updated = {}
     for i,p in pairs(wall) do
         wall_updated[i] = point_update(p)
+    end
+
+    if wall_updated[3].x < 0 then 
+        print("replacing things")
+        table.remove(wall_updated, 1)
+        table.insert(wall_updated,
+                     generate_point(num_points + 2,
+                                    num_points,
+                                    x_variation,
+                                    y_variation,
+                                    wall_offset))
     end
 
     return wall_updated
@@ -64,17 +75,23 @@ function wall_draw(wall)
 end
 
 
+function wall_move(wall, amount)
+    for i, p in ipairs(wall) do
+        p.x = p.x + amount
+    end
+end
+
+
 function love.load()
-    x_variation = 40
-    y_variation = 30
-    local y_dist = 100
-    local num_points = 6
+    x_variation = 10
+    y_variation = 20
+    y_dist = 100
+    num_points = 50
 
     wall_top = wall_generate(num_points, x_variation, y_variation, y_dist)
     wall_bottom = wall_generate(num_points, x_variation, y_variation,
                                 love.graphics.getHeight() - y_dist)
 
-    love.graphics.setPoint(1, "rough")
 end
 
 
@@ -82,8 +99,9 @@ function love.draw()
     wall_draw(wall_top)
     wall_draw(wall_bottom)
 
-    wall_update(wall_top)
-    wall_update(wall_bottom)
+    wall_move(wall_top, -5)
+    wall_move(wall_bottom, -5)
+
+    wall_top = wall_update(wall_top, y_dist)
+    wall_bottom = wall_update(wall_bottom, love.graphics.getHeight() - y_dist)
 end
-
-
